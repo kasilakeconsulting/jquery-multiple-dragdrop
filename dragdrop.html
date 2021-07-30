@@ -1,0 +1,269 @@
+<html>
+<head>
+<title>Drag/Drop Lists Example</title>
+
+<!-- Include the JQuery files. -->
+<link type="text/css" href="scripts/jquery-ui-1.12.1.custom/jquery-ui.min.css" rel="stylesheet" />	
+<script type="text/javascript" src="scripts/jquery-3.6.0.min.js"></script>
+<script type="text/javascript" src="scripts/jquery-ui-1.12.1.custom/jquery-ui.min.js"></script>
+
+<!-- Setups I want for the UI items. -->    
+<script type="text/javascript">
+
+/*
+This function confirms that at least one item from each of the lists
+was dropped into the meallist before allowing the form to submit.
+*/
+
+function confirmItems() {
+  var allowSubmit = false;
+  var mealListArray = $("#meallist").sortable("toArray");
+
+  if (mealListArray.length > 0)
+  {
+	var meatCount = 0;
+	var veggieCount = 0;
+	var starchCount = 0;
+	var item;
+	var i;
+
+	for (i = 0; i < mealListArray.length; i++)
+	{
+	  item = mealListArray[i];
+	  if (item.substring(0, 4) == 'meat') ++meatCount;
+	  if (item.substring(0, 4) == 'vegl') ++veggieCount;
+	  if (item.substring(0, 4) == 'star') ++starchCount;
+	}
+
+	if ((meatCount > 0) && (veggieCount > 0) && (starchCount > 0)) allowSubmit = true;
+  }
+
+  if (allowSubmit == false)
+  {
+	alert('You must drop at least one Meat, Veggie, and Starch into the Meal box.');
+  } else {
+	alert('The counts are meat ('+meatCount+'), veggies ('+veggieCount+
+		'), starch ('+starchCount+'). You may now compose another meal.');
+  }
+
+  return allowSubmit;
+}
+
+/*
+This function will be called by sortable (specified below) after an
+item is dropped in a new location. Note that this function will NOT
+be called if you drop the item back in its original position. The
+item IDs are returned by the toArray call.
+*/
+function getMealOrder() {
+  document.getElementById('mealitems').value = $("#meallist").sortable("toArray");
+}
+
+$("document").ready(function () {
+  $(function () {
+
+	/*
+	The connnectWith option lets you specify where an item may be dropped.
+	Even though it's not specified, a list item can also be dropped back
+	into its own list by default.
+	*/
+
+	$("#meatlist").sortable({
+	  cursor: 'move',
+	  connectWith: "#meallist",
+	  /*
+	  Receive is triggered when something is dropped on this list.
+	  We'll get the prefix if the list item to determine if it's
+	  allowed in this list. If it's not, we'll return it to the
+	  meallist box.
+	  */
+	  receive: function (event, ui) {
+		var itemID = ui.item.attr('id');
+		var idPrefix = itemID.substring(0, 4);
+
+		if (idPrefix != 'meat') {
+		  // Appending it to meallist also removes it from our list.
+		  ui.item.appendTo('#meallist');
+		  // Refresh meallist order because the append doesn't
+		  // trigger a sortable update event.
+		  getMealOrder();
+		}
+	  }
+	});
+	$("#veggielist").sortable({
+	  cursor: 'move',
+	  connectWith: "#meallist",
+	  /*
+	  Receive is triggered when something is dropped on this list.
+	  We'll get the prefix if the list item to determine if it's
+	  allowed in this list. If it's not, we'll return it to the
+	  meallist box.
+	  */
+	  receive: function (event, ui) {
+		var itemID = ui.item.attr('id');
+		var idPrefix = itemID.substring(0, 4);
+
+		if (idPrefix != 'vegl') {
+		  // Appending it to meallist also removes it from our list.
+		  ui.item.appendTo('#meallist');
+		  // Refresh meallist order because the append doesn't
+		  // trigger a sortable update event.
+		  getMealOrder();
+		}
+	  }
+	});
+	$("#starchlist").sortable({
+	  cursor: 'move',
+	  connectWith: "#meallist",
+	  /*
+	  Receive is triggered when something is dropped on this list.
+	  We'll get the prefix if the list item to determine if it's
+	  allowed in this list. If it's not, we'll return it to the
+	  meallist box.
+	  */
+	  receive: function (event, ui) {
+		var itemID = ui.item.attr('id');
+		var idPrefix = itemID.substring(0, 4);
+
+		if (idPrefix != 'star') {
+		  // Appending it to meallist also removes it from our list.
+		  ui.item.appendTo('#meallist');
+		  // Refresh meallist order because the append doesn't
+		  // trigger a sortable update event.
+		  getMealOrder();
+		}
+	  }
+	});
+	$("#meallist").sortable({
+	  cursor: 'move',
+	  /*
+	  When an item is added/removed from the box, or the sort order
+	  changes, update the list of item codes displayed.
+	  */
+	  update: function () { getMealOrder(); },
+	  /*
+	  Allow connections back to the other lists. The lists themselves
+	  will determine if what they're getting is acceptable for their list.
+	  */
+	  connectWith: "#meatlist,#veggielist,#starchlist",
+	});
+  });
+
+});
+</script>
+
+<style type="text/css">
+#meatlist { list-style-type: none; margin: 0; padding: 20px; width: 100px;
+			background: #eee;}
+#meatlist li { margin: 0 3px 3px 3px; padding: 0.4em; padding-left: 1.5em;
+			   font-size: 1.0em; height: 14px; }
+#meatlist li span { position: absolute; margin-left: -1.3em; }
+
+#veggielist { list-style-type: none; margin: 0; padding: 20px; width: 150px;
+			  background: #eee;}
+#veggielist li { margin: 0 3px 3px 3px; padding: 0.4em; padding-left: 1.5em;
+				 font-size: 1.0em; height: 14px; }
+#veggielist li span { position: absolute; margin-left: -1.3em; }
+
+#starchlist { list-style-type: none; margin: 0; padding: 20px; width: 100px;
+			  background: #eee;}
+#starchlist li { margin: 0 3px 3px 3px; padding: 0.4em; padding-left: 1.5em;
+				 font-size: 1.0em; height: 14px; }
+#starchlist li span { position: absolute; margin-left: -1.3em; }
+
+#meallist { list-style-type: none; margin: 0; padding: 20px; width: 150px;
+			background: #eee;}
+#meallist li { margin: 0 3px 3px 3px; padding: 0.4em; padding-left: 1.5em;
+			   font-size: 1.0em; height: 14px; }
+#meallist li span { position: absolute; margin-left: -1.3em; }
+</style>
+
+</head>
+
+<body>
+<noscript><b>This page requires the use of JavaScript.
+Please enable JavaScript for this website.</b><hr><p/><br/></noscript>
+
+
+<form id="form1" runat="server" method="post" onsubmit="return confirmItems()">
+<div>
+<p>This is a drag/drop example using multiple lists.</p>
+
+<p>Click on any of the Meat, Veggie, and Starch items and drag/drop in the Meal box.
+Click the Submit button, and it will confirm that you've selected at least one item from
+each list. You may also drag/drop an item in the Meal box back to its source list.</p>
+
+ <p>
+<table border=0 cellpadding=8 cellspacing=0>
+<tr>
+<td align=center valign=bottom><b>Meat</b></td>
+<td align=center valign=bottom><b>Veggie</b></td>
+<td align=center valign=bottom><b>Starch</b></td>
+<td align=center valign=bottom><b>Meal</b></td>
+</tr>
+
+<!--
+The IDs are used to determine an item's source.
+These will be used to limit where you can return an item dropped into Meal.
+-->
+
+<tr>
+<td align=left valign=top>
+  <div id="meatdiv" class="meatclass">
+  <ul id="meatlist">
+	  <li id="meat-chicken" class="ui-state-default">Chicken</li>
+	  <li id="meat-tofu" class="ui-state-default">Tofu</li>
+	  <li id="meat-pork" class="ui-state-default">Pork</li>
+	  <li id="meat-fish" class="ui-state-default">Fish</li>
+	  <li id="meat-beef" class="ui-state-default">Beef</li>
+  </ul>
+  </div>
+</td>
+
+<td align=left valign=top>
+  <div id="veggiediv" class="veggieclass">
+  <ul id="veggielist">
+	  <li id="vegl-tomato" class="ui-state-default">Tomato</li>
+	  <li id="vegl-spinach" class="ui-state-default">Spinach</li>
+	  <li id="vegl-greenbeans" class="ui-state-default">Green beans</li>
+	  <li id="vegl-brusselsprouts" class="ui-state-default">Brussel sprouts</li>
+	  <li id="vegl-cauliflower" class="ui-state-default">Cauliflower</li>
+	  <li id="vegl-peas" class="ui-state-default">Peas</li>
+  </ul>
+  </div>
+</td>
+
+<td align=left valign=top>
+  <div id="starchdiv" class="starchclass">
+  <ul id="starchlist">
+	  <li id="star-potatoes" class="ui-state-default">Potatoes</li>
+	  <li id="star-pasta" class="ui-state-default">Pasta</li>
+	  <li id="star-rice" class="ui-state-default">Rice</li>
+	  <li id="star-corn" class="ui-state-default">Corn</li>
+  </ul>
+  </div>
+</td>
+
+<td align=left valign=top>
+  <div id="mealdiv" class="mealclass">
+  <ul id="meallist">
+  </ul>
+  </div>
+</td>
+
+</tr>
+</table>
+</p> 
+
+<!--
+You can make the input type HIDDEN but don't make it disabled or you won't be able
+to reference it on the results page.
+-->
+<p>Codes for items dropped in Meal box:
+<input id="mealitems" name="mealitems" type="text" size="50"/></p>
+
+<p><input type="submit" name="submit" value="Submit" /></p>
+</div>
+</form>
+</body>
+</html>
